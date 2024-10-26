@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio for Associate Professor Promotion</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        textarea {
+            width: 100%;
+            padding: 16px;
+            background-color: #f3f4f6;
+            border-radius: 8px;
+            min-height: 150px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Navigation Bar -->
+    <nav class="bg-blue-800 p-4">
+        <ul class="flex space-x-4 justify-center text-white">
+            <li><a href="#cover-letter" class="hover:text-gray-300">Cover Letter & CV</a></li>
+            <li><a href="#mission" class="hover:text-gray-300">Catholic Mission Fidelity</a></li>
+            <li><a href="#scholarship" class="hover:text-gray-300">Scholarship</a></li>
+            <li><a href="#teaching" class="hover:text-gray-300">Teaching</a></li>
+            <li><a href="#service" class="hover:text-gray-300">Service</a></li>
+            <li><a href="#criteria" class="hover:text-gray-300">Discipline Criteria</a></li>
+            <li><a href="#contract" class="hover:text-gray-300">Hiring Contract</a></li>
+            <li><a href="#mandatum" class="hover:text-gray-300">Mandatum</a></li>
+        </ul>
+    </nav>
+
+    <!-- Cover Letter & CV Section -->
+    <section id="cover-letter" class="py-12 px-6">
+        <div class="container mx-auto bg-white p-8 rounded shadow">
+            <h2 class="text-2xl font-bold mb-4">Cover Letter & CV</h2>
+            <textarea id="cover-letter-text" placeholder="Insert your cover letter here..."></textarea>
+
+            <!-- PDF Upload for CV -->
+            <div class="mt-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2" for="cv-upload">Upload CV (PDF format):</label>
+                <input type="file" id="cv-upload" accept="application/pdf" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:bg-blue-800 file:text-white hover:file:bg-blue-700">
+                <button id="upload-cv-btn" class="mt-4 bg-blue-800 text-white py-2 px-4 rounded hover:bg-blue-700">Upload CV</button>
+            </div>
+
+            <!-- Status and Link Display -->
+            <div class="mt-4" id="cv-status"></div>
+            <div id="cv-link" class="mt-4"></div>
+        </div>
+    </section>
+
+    <!-- Catholic Mission Fidelity Section -->
+    <section id="mission" class="py-12 px-6">
+        <div class="container mx-auto bg-white p-8 rounded shadow">
+            <h2 class="text-2xl font-bold mb-4">Fidelity to Catholic Academic Mission</h2>
+            <textarea id="mission-content" placeholder="Describe your commitment to the Catholic academic mission..."></textarea>
+        </div>
+    </section>
+
+    <!-- Scholarship Section -->
+    <section id="scholarship" class="py-12 px-6">
+        <div class="container mx-auto bg-white p-8 rounded shadow">
+            <h2 class="text-2xl font-bold mb-4">Scholarship</h2>
+            <textarea id="scholarship-content" placeholder="Describe your scholarship work..."></textarea>
+        </div>
+    </section>
+
+    <!-- Teaching Section -->
+    <section id="teaching" class="py-12 px-6">
+        <div class="container mx-auto bg-white p-8 rounded shadow">
+            <h2 class="text-2xl font-bold mb-4">Teaching</h2>
+            <textarea id="teaching-content" placeholder="Describe your teaching philosophy..."></textarea>
+        </div>
+    </section>
+
+    <!-- Service Section -->
+    <section id="service" class="py-12 px-6">
+        <div class="container mx-auto bg-white p-8 rounded shadow">
+            <h2 class="text-2xl font-bold mb-4">Service</h2>
+            <textarea id="service-content" placeholder="Describe your service contributions..."></textarea>
+        </div>
+    </section>
+
+    <!-- Discipline-Specific Criteria Section -->
+    <section id="criteria" class="py-12 px-6">
+        <div class="container mx-auto bg-white p-8 rounded shadow">
+            <h2 class="text-2xl font-bold mb-4">Discipline-Specific Criteria</h2>
+            <textarea id="criteria-content" placeholder="Outline your discipline-specific promotion criteria..."></textarea>
+        </div>
+    </section>
+
+    <!-- Hiring Contract Agreement Section -->
+    <section id="contract" class="py-12 px-6">
+        <div class="container mx-auto bg-white p-8 rounded shadow">
+            <h2 class="text-2xl font-bold mb-4">Hiring Contract Agreement</h2>
+            <textarea id="contract-content" placeholder="Provide details about your hiring contract..."></textarea>
+        </div>
+    </section>
+
+    <!-- Mandatum Section -->
+    <section id="mandatum" class="py-12 px-6">
+        <div class="container mx-auto bg-white p-8 rounded shadow">
+            <h2 class="text-2xl font-bold mb-4">Mandatum</h2>
+            <textarea id="mandatum-content" placeholder="Provide details about your mandatum..."></textarea>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-blue-800 p-4 text-white text-center mt-12">
+        <p>&copy; 2024 Associate Professor Promotion Portfolio</p>
+    </footer>
+
+    <!-- JavaScript for Handling Uploads and Input Data -->
+    <script>
+        const BASE_URL = 'http://localhost:5000/api/portfolio';
+
+        // Function to save text content to the backend
+        async function saveContent(section, content) {
+            try {
+                const response = await fetch(`${BASE_URL}/${section}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ content }),
+                });
+                const result = await response.json();
+                console.log(result.message);
+            } catch (error) {
+                console.error('Error saving content:', error);
+            }
+        }
+
+        // Function to load text content from the backend
+        async function loadContent(section, elementId) {
+            try {
+                const response = await fetch(`${BASE_URL}/${section}`);
+                const data = await response.json();
+                if (data && data.content) {
+                    document.getElementById(elementId).value = data.content;
+                }
+
+                if (section === 'cv' && data.cvPath) {
+                    document.getElementById('cv-link').innerHTML = `<a href="http://localhost:5000/${data.cvPath}" target="_blank" class="text-blue-500 underline">View Uploaded CV</a>`;
+                }
+            } catch (error) {
+                console.error('Error loading content:', error);
+            }
+        }
+
+        // Function to upload CV PDF to the backend
+        async function uploadCV(file) {
+            const formData = new FormData();
+            formData.append('cv', file);
+
+            try {
+                const response = await fetch(`${BASE_URL}/upload-cv`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    document.getElementById('cv-status').textContent = 'CV uploaded successfully!';
+                    document.getElementById('cv-status').className = 'text-green-500';
+                    document.getElementById('cv-link').innerHTML = `<a href="http://localhost:5000/${result.filePath}" target="_blank" class="text-blue-500 underline">View Uploaded CV</a>`;
+                } else {
+                    document.getElementById('cv-status').textContent = 'Failed to upload CV';
+                    document.getElementById('cv-status').className = 'text-red-500';
+                }
+            } catch (error) {
+                console.error('Error uploading CV:', error);
+                document.getElementById('cv-status').textContent = 'An error occurred while uploading the CV';
+                document.getElementById('cv-status').className = 'text-red-500';
+            }
+        }
+
+        // Event listener for uploading CV
+        document.getElementById('upload-cv-btn').addEventListener('click', () => {
+            const cvFile = document.getElementById('cv-upload').files[0];
+            if (!cvFile) {
+                document.getElementById('cv-status').textContent = 'No file selected';
+                document.getElementById('cv-status').className = 'text-red-500';
+                return;
+            }
+
+            if (cvFile.type !== 'application/pdf') {
+                document.getElementById('cv-status').textContent = 'Please upload a PDF file';
+                document.getElementById('cv-status').className = 'text-red-500';
+                return;
+            }
+
+            uploadCV(cvFile);
+        });
+
+        // Saving text content when user types
+        document.querySelectorAll('textarea').forEach(textarea => {
+            textarea.addEventListener('input', function() {
+                const section = this.id.replace('-text', '').replace('-content', '');
+                saveContent(section, this.value);
+            });
+        });
+
+        // Load content on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadContent('cover-letter', 'cover-letter-text');
+            loadContent('cv', 'cv');
+            loadContent('mission-content', 'mission-content');
+            loadContent('scholarship-content', 'scholarship-content');
+            loadContent('teaching-content', 'teaching-content');
+            loadContent('service-content', 'service-content');
+            loadContent('criteria-content', 'criteria-content');
+            loadContent('contract-content', 'contract-content');
+            loadContent('mandatum-content', 'mandatum-content');
+        });
+    </script>
+</body>
+</html>cd <portfolio-backend>
+    node server.js
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Portfolio for Associate Professor Promotion</title>
+      <!-- Tailwind CSS for styling -->
+      <script src="https://cdn.tailwindcss.com"></script>
+      <style>
+        textarea {
+          width: 100%;
+          padding: 16px;
+          background-color: #f3f4f6;
+          border-radius: 8px;
+          min-height: 150px;
+          margin-bottom: 20px;
+        }
+      </style>
+    </head>
+    <body class="bg-gray-100">
+    
+      <!-- Navigation Bar -->
+      <nav class="bg-blue-800 p-4">
+        <ul class="flex space-x-4 justify-center text-white">
+          <li><a href="#cover-letter" class="hover:text-gray-300">Cover Letter & CV</a></li>
+          <li><a href="#mission" class="hover:text-gray-300">Catholic Mission Fidelity</a></li>
+          <li><a href="#scholarship" class="hover:text-gray-300">Scholarship</a></li>
+          <li><a href="#teaching" class="hover:text-gray-300">Teaching</a></li>
+          <li><a href="#service" class="hover:text-gray-300">Service</a></li>
+          <li><a href="#criteria" class="hover:text-gray-300">Discipline Criteria</a></li>
+          <li><a href="#contract" class="hover:text-gray-300">Hiring Contract</a></li>
+          <li><a href="#mandatum" class="hover:text-gray-300">Mandatum</a></li>
+        </ul>
+      </nav>
+    
+      <!-- Cover Letter & CV Section -->
+      <section id="cover-letter" class="py-12 px-6">
+        <div class="container mx-auto bg-white p-8 rounded shadow">
+          <h2 class="text-2xl font-bold mb-4">Cover Letter & CV</h2>
+          <textarea id="cover-letter-text" placeholder="Insert your cover letter here..."></textarea>
+    
+          <!-- PDF Upload for CV -->
+          <div class="mt-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="cv-upload">Upload CV (PDF format):</label>
+            <input type="file" id="cv-upload" accept="application/pdf" class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:bg-blue-800 file:text-white hover:file:bg-blue-700">
+            <button id="upload-cv-btn" class="mt-4 bg-blue-800 text-white py-2 px-4 rounded hover:bg-blue-700">Upload CV</button>
+          </div>
+    
+          <!-- Status and Link Display -->
+          <div class="mt-4" id="cv-status"></div>
+          <div id="cv-link" class="mt-4"></div>
+        </div>
+      </section>
+    
+      <!-- Catholic Mission Fidelity Section -->
+      <section id="mission" class="py-12 px-6">
+        <div class="container mx-auto bg-white p-8 rounded shadow">
+          <h2 class="text-2xl font-bold mb-4">Fidelity to Catholic Academic Mission</h2>
+          <textarea id="mission-content" placeholder="Describe your commitment to the Catholic academic mission..."></textarea>
+        </div>
+      </section>
+    
+      <!-- Scholarship Section -->
+      <section id="scholarship" class="py-12 px-6">
+        <div class="container mx-auto bg-white p-8 rounded shadow">
+          <h2 class="text-2xl font-bold mb-4">Scholarship</h2>
+          <textarea id="scholarship-content" placeholder="Describe your scholarship work..."></textarea>
+        </div>
+      </section>
+    
+      <!-- Teaching Section -->
+      <section id="teaching" class="py-12 px-6">
+        <div class="container mx-auto bg-white p-8 rounded shadow">
+          <h2 class="text-2xl font-bold mb-4">Teaching</h2>
+          <textarea id="teaching-content" placeholder="Describe your teaching philosophy..."></textarea>
+        </div>
+      </section>
+    
+      <!-- Service Section -->
+      <section id="service" class="py-12 px-6">
+        <div class="container mx-auto bg-white p-8 rounded shadow">
+          <h2 class="text-2xl font-bold mb-4">Service</h2>
+          <textarea id="service-content" placeholder="Describe your service contributions..."></textarea>
+        </div>
+      </section>
+    
+      <!-- Discipline-Specific Criteria Section -->
+      <section id="criteria" class="py-12 px-6">
+        <div class="container mx-auto bg-white p-8 rounded shadow">
+          <h2 class="text-2xl font-bold mb-4">Discipline-Specific Criteria</h2>
+          <textarea id="criteria-content" placeholder="Outline your discipline-specific promotion criteria..."></textarea>
+        </div>
+      </section>
+    
+      <!-- Hiring Contract Agreement Section -->
+      <section id="contract" class="py-12 px-6">
+        <div class="container mx-auto bg-white p-8 rounded shadow">
+          <h2 class="text-2xl font-bold mb-4">Hiring Contract Agreement</h2>
+          <textarea id="contract-content" placeholder="Provide details about your hiring contract..."></textarea>
+        </div>
+      </section>
+    
+      <!-- Mandatum Section -->
+      <section id="mandatum" class="py-12 px-6">
+        <div class="container mx-auto bg-white p-8 rounded shadow">
+          <h2 class="text-2xl font-bold mb-4">Mandatum</h2>
+          <textarea id="mandatum-content" placeholder="Provide details about your mandatum..."></textarea>
+        </div>
+      </section>
+    
+      <!-- Footer -->
+      <footer class="bg-blue-800 p-4 text-white text-center mt-12">
+        <p>&copy; 2024 Associate Professor Promotion Portfolio</p>
+      </footer>
+    
+      <!-- JavaScript for Handling Uploads and Input Data -->
+      <script>
+        const BASE_URL = 'http://localhost:5000/api/portfolio';
+    
+        // Function to save text content to the backend
+        async function saveContent(section, content) {
+          try {
+            const response = await fetch(`${BASE_URL}/${section}`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ content }),
+            });
+            const result = await response.json();
+            console.log(result.message);
+          } catch (error) {
+            console.error('Error saving content:', error);
+          }
+        }
+    
+        // Function to load text content from the backend
+        async function loadContent(section, elementId) {
+          try {
+            const response = await fetch(`${BASE_URL}/${section}`);
+            const data = await response.json();
+            if (data && data.content) {
+              document.getElementById(elementId).value = data.content;
+            }
+    
+            if (section === 'cv' && data.cvPath) {
+              document.getElementById('cv-link').innerHTML = `<a href="http://localhost:5000/${data.cvPath}" target="_blank" class="text-blue-500 underline">View Uploaded CV</a>`;
+            }
+          } catch (error) {
+            console.error('Error loading content:', error);
+          }
+        }
+    
+        // Function to upload CV PDF to the backend
+        async function uploadCV(file) {
+          const formData = new FormData();
+          formData.append('cv', file);
+    
+          try {
+            const response = await fetch(`${BASE_URL}/upload-cv`, {
+              method: 'POST',
+              body: formData
+            });
+    
+            const result = await response.json();
+    
+            if (response.ok) {
+              document.getElementById('cv-status').textContent = 'CV uploaded successfully!';
+              document.getElementById('cv-status').className = 'text-green-500';
+              document.getElementById('cv-link').innerHTML = `<a href="http://localhost:5000/${result.filePath}" target="_blank" class="text-blue-500 underline">View Uploaded CV</a>`;
+            } else {
+              document.getElementById('cv-status').textContent = 'Failed to upload CV';
+              document.getElementById('cv-status').className = 'text-red-500';
+            }
+          } catch (error) {
+            console.error('Error uploading CV:', error);
+            document.getElementById('cv-status').textContent = 'An error occurred while uploading the CV';
+            document.getElementById('cv-status').className = 'text-red-500';
+          }
+        }
+    
+        // Event listener for uploading CV
+        document.getElementById('upload-cv-btn').addEventListener('click', () => {
+          const cvFile = document.getElementById('cv-upload').files[0];
+          if (!cvFile) {
+            document.getElementById('cv-status').textContent = 'No file selected';
+            document.getElementById('cv-status').className = 'text-red-500';
+            return;
+          }
+    
+          if (cvFile.type !== 'application/pdf') {
+            document.getElementById('cv-status').textContent = 'Please upload a PDF file';
+            document.getElementById('cv-status').className = 'text-red-500';
+            return;
+          }
+    
+          uploadCV(cvFile);
+        });
+    
+        // Saving text content when user types
+        document.querySelectorAll('textarea').forEach(textarea => {
+          textarea.addEventListener('input', function() {
+            const section = this.id.replace('-text', '').replace('-content', '');
+            saveContent(section, this.value);
+          });
+        });
+    
+        // Load content on page load
+        window.addEventListener('DOMContentLoaded', () => {
+          loadContent('cover-letter', 'cover-letter-text');
+          loadContent('cv', 'cv');
+          loadContent('mission-content', 'mission-content');
+          loadContent('scholarship-content', 'scholarship-content');
+          loadContent('teaching-content', 'teaching-content');
+          loadContent('service-content', 'service-content');
+          loadContent('criteria-content', 'criteria-content');
+          loadContent('contract-content', 'contract-content');
+          loadContent('mandatum-content', 'mandatum-content');
+        });
+      </script>
+    </body>
+    </html>
+      
